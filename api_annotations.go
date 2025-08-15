@@ -10,19 +10,150 @@ import (
 	"strings"
 )
 
-type DimensionsApiService service
+type AnnotationsApiService service
 
-type ListDimensionElementsParams struct {
-	Limit          int32
-	Filters        []string
-	MetricFilters  []string
-	Timeframe      []string
-	OrderBy        string
-	OrderDirection string
+func (a *AnnotationsApiService) CreateAnnotation(annotationInput AnnotationInput, opts ...APIOption) (AnnotationResponse, error) {
+	var (
+		localVarAPIOptions   = new(APIOptions)
+		localVarHttpMethod   = strings.ToUpper("Post")
+		localVarPostBody     interface{}
+		localVarFormFileName string
+		localVarFileName     string
+		localVarFileBytes    []byte
+		localVarReturnValue  AnnotationResponse
+	)
+
+	for _, opt := range opts {
+		opt(localVarAPIOptions)
+	}
+
+	// create path and map variables
+	localVarPath := a.client.cfg.basePath + "/data/v1/annotations"
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	// to determine the Content-Type header
+	localVarHttpContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHttpContentType := selectHeaderContentType(localVarHttpContentTypes)
+	if localVarHttpContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHttpContentType
+	}
+
+	// to determine the Accept header
+	localVarHttpHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHttpHeaderAccept := selectHeaderAccept(localVarHttpHeaderAccepts)
+	if localVarHttpHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
+	}
+	// body params
+	localVarPostBody = &annotationInput
+
+	r, err := a.client.prepareRequest(localVarAPIOptions, localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
+	if err != nil {
+		return localVarReturnValue, err
+	}
+
+	localVarHttpResponse, err := a.client.callAPI(r)
+	if err != nil || localVarHttpResponse == nil {
+		return localVarReturnValue, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHttpResponse.Body)
+	localVarHttpResponse.Body.Close()
+	if err != nil {
+		return localVarReturnValue, err
+	}
+
+	// Check for common HTTP error status codes
+	err = CheckForHttpError(localVarHttpResponse.StatusCode, localVarBody)
+	if err != nil {
+		return localVarReturnValue, err
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, newErr
+	}
+
+	return localVarReturnValue, nil
 }
 
-// ListDimensionElements optionally accepts the APIOption of WithParams(*ListDimensionElementsParams).
-func (a *DimensionsApiService) ListDimensionElements(dIMENSIONID string, opts ...APIOption) (ListDimensionValuesResponse, error) {
+func (a *AnnotationsApiService) DeleteAnnotation(aNNOTATIONID string, opts ...APIOption) error {
+	var (
+		localVarAPIOptions   = new(APIOptions)
+		localVarHttpMethod   = strings.ToUpper("Delete")
+		localVarPostBody     interface{}
+		localVarFormFileName string
+		localVarFileName     string
+		localVarFileBytes    []byte
+	)
+
+	for _, opt := range opts {
+		opt(localVarAPIOptions)
+	}
+
+	// create path and map variables
+	localVarPath := a.client.cfg.basePath + "/data/v1/annotations/{ANNOTATION_ID}"
+	localVarPath = strings.Replace(localVarPath, "{"+"ANNOTATION_ID"+"}", fmt.Sprintf("%v", aNNOTATIONID), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	// to determine the Content-Type header
+	localVarHttpContentTypes := []string{}
+
+	// set Content-Type header
+	localVarHttpContentType := selectHeaderContentType(localVarHttpContentTypes)
+	if localVarHttpContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHttpContentType
+	}
+
+	// to determine the Accept header
+	localVarHttpHeaderAccepts := []string{}
+
+	// set Accept header
+	localVarHttpHeaderAccept := selectHeaderAccept(localVarHttpHeaderAccepts)
+	if localVarHttpHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
+	}
+
+	r, err := a.client.prepareRequest(localVarAPIOptions, localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
+	if err != nil {
+		return err
+	}
+
+	localVarHttpResponse, err := a.client.callAPI(r)
+	if err != nil || localVarHttpResponse == nil {
+		return err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHttpResponse.Body)
+	localVarHttpResponse.Body.Close()
+	if err != nil {
+		return err
+	}
+
+	// Check for common HTTP error status codes
+	err = CheckForHttpError(localVarHttpResponse.StatusCode, localVarBody)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (a *AnnotationsApiService) GetAnnotation(aNNOTATIONID string, opts ...APIOption) (AnnotationResponse, error) {
 	var (
 		localVarAPIOptions   = new(APIOptions)
 		localVarHttpMethod   = strings.ToUpper("Get")
@@ -30,56 +161,21 @@ func (a *DimensionsApiService) ListDimensionElements(dIMENSIONID string, opts ..
 		localVarFormFileName string
 		localVarFileName     string
 		localVarFileBytes    []byte
-		localVarReturnValue  ListDimensionValuesResponse
+		localVarReturnValue  AnnotationResponse
 	)
 
 	for _, opt := range opts {
 		opt(localVarAPIOptions)
 	}
 
-	localVarOptionals, ok := localVarAPIOptions.params.(*ListDimensionElementsParams)
-	if localVarAPIOptions.params != nil && !ok {
-		return localVarReturnValue, reportError("provided params were not of type *ListDimensionElementsParams")
-	}
-
 	// create path and map variables
-	localVarPath := a.client.cfg.basePath + "/data/v1/dimensions/{DIMENSION_ID}/elements"
-	localVarPath = strings.Replace(localVarPath, "{"+"DIMENSION_ID"+"}", fmt.Sprintf("%v", dIMENSIONID), -1)
+	localVarPath := a.client.cfg.basePath + "/data/v1/annotations/{ANNOTATION_ID}"
+	localVarPath = strings.Replace(localVarPath, "{"+"ANNOTATION_ID"+"}", fmt.Sprintf("%v", aNNOTATIONID), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
 	localVarFormParams := url.Values{}
 
-	if localVarOptionals != nil && isSet(localVarOptionals.Limit) {
-		localVarQueryParams.Add("limit", parameterToString(localVarOptionals.Limit, ""))
-	}
-	if localVarOptionals != nil && isSet(localVarOptionals.Filters) {
-		// This will "always work" for Mux's use case, since we always treat collections in query params as "multi" types.
-		// The first version of this code checked the collectionFormat, but that's just wasted CPU cycles right now.
-		for _, v := range localVarOptionals.Filters {
-			localVarQueryParams.Add("filters[]", v)
-		}
-	}
-	if localVarOptionals != nil && isSet(localVarOptionals.MetricFilters) {
-		// This will "always work" for Mux's use case, since we always treat collections in query params as "multi" types.
-		// The first version of this code checked the collectionFormat, but that's just wasted CPU cycles right now.
-		for _, v := range localVarOptionals.MetricFilters {
-			localVarQueryParams.Add("metric_filters[]", v)
-		}
-	}
-	if localVarOptionals != nil && isSet(localVarOptionals.Timeframe) {
-		// This will "always work" for Mux's use case, since we always treat collections in query params as "multi" types.
-		// The first version of this code checked the collectionFormat, but that's just wasted CPU cycles right now.
-		for _, v := range localVarOptionals.Timeframe {
-			localVarQueryParams.Add("timeframe[]", v)
-		}
-	}
-	if localVarOptionals != nil && isSet(localVarOptionals.OrderBy) {
-		localVarQueryParams.Add("order_by", parameterToString(localVarOptionals.OrderBy, ""))
-	}
-	if localVarOptionals != nil && isSet(localVarOptionals.OrderDirection) {
-		localVarQueryParams.Add("order_direction", parameterToString(localVarOptionals.OrderDirection, ""))
-	}
 	// to determine the Content-Type header
 	localVarHttpContentTypes := []string{}
 
@@ -132,16 +228,15 @@ func (a *DimensionsApiService) ListDimensionElements(dIMENSIONID string, opts ..
 	return localVarReturnValue, nil
 }
 
-type ListDimensionValuesParams struct {
-	Limit         int32
-	Page          int32
-	Filters       []string
-	MetricFilters []string
-	Timeframe     []string
+type ListAnnotationsParams struct {
+	Limit          int32
+	Page           int32
+	OrderDirection string
+	Timeframe      []string
 }
 
-// ListDimensionValues optionally accepts the APIOption of WithParams(*ListDimensionValuesParams).
-func (a *DimensionsApiService) ListDimensionValues(dIMENSIONID string, opts ...APIOption) (ListDimensionValuesResponse, error) {
+// ListAnnotations optionally accepts the APIOption of WithParams(*ListAnnotationsParams).
+func (a *AnnotationsApiService) ListAnnotations(opts ...APIOption) (ListAnnotationsResponse, error) {
 	var (
 		localVarAPIOptions   = new(APIOptions)
 		localVarHttpMethod   = strings.ToUpper("Get")
@@ -149,21 +244,20 @@ func (a *DimensionsApiService) ListDimensionValues(dIMENSIONID string, opts ...A
 		localVarFormFileName string
 		localVarFileName     string
 		localVarFileBytes    []byte
-		localVarReturnValue  ListDimensionValuesResponse
+		localVarReturnValue  ListAnnotationsResponse
 	)
 
 	for _, opt := range opts {
 		opt(localVarAPIOptions)
 	}
 
-	localVarOptionals, ok := localVarAPIOptions.params.(*ListDimensionValuesParams)
+	localVarOptionals, ok := localVarAPIOptions.params.(*ListAnnotationsParams)
 	if localVarAPIOptions.params != nil && !ok {
-		return localVarReturnValue, reportError("provided params were not of type *ListDimensionValuesParams")
+		return localVarReturnValue, reportError("provided params were not of type *ListAnnotationsParams")
 	}
 
 	// create path and map variables
-	localVarPath := a.client.cfg.basePath + "/data/v1/dimensions/{DIMENSION_ID}"
-	localVarPath = strings.Replace(localVarPath, "{"+"DIMENSION_ID"+"}", fmt.Sprintf("%v", dIMENSIONID), -1)
+	localVarPath := a.client.cfg.basePath + "/data/v1/annotations"
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -175,19 +269,8 @@ func (a *DimensionsApiService) ListDimensionValues(dIMENSIONID string, opts ...A
 	if localVarOptionals != nil && isSet(localVarOptionals.Page) {
 		localVarQueryParams.Add("page", parameterToString(localVarOptionals.Page, ""))
 	}
-	if localVarOptionals != nil && isSet(localVarOptionals.Filters) {
-		// This will "always work" for Mux's use case, since we always treat collections in query params as "multi" types.
-		// The first version of this code checked the collectionFormat, but that's just wasted CPU cycles right now.
-		for _, v := range localVarOptionals.Filters {
-			localVarQueryParams.Add("filters[]", v)
-		}
-	}
-	if localVarOptionals != nil && isSet(localVarOptionals.MetricFilters) {
-		// This will "always work" for Mux's use case, since we always treat collections in query params as "multi" types.
-		// The first version of this code checked the collectionFormat, but that's just wasted CPU cycles right now.
-		for _, v := range localVarOptionals.MetricFilters {
-			localVarQueryParams.Add("metric_filters[]", v)
-		}
+	if localVarOptionals != nil && isSet(localVarOptionals.OrderDirection) {
+		localVarQueryParams.Add("order_direction", parameterToString(localVarOptionals.OrderDirection, ""))
 	}
 	if localVarOptionals != nil && isSet(localVarOptionals.Timeframe) {
 		// This will "always work" for Mux's use case, since we always treat collections in query params as "multi" types.
@@ -248,15 +331,15 @@ func (a *DimensionsApiService) ListDimensionValues(dIMENSIONID string, opts ...A
 	return localVarReturnValue, nil
 }
 
-func (a *DimensionsApiService) ListDimensions(opts ...APIOption) (ListDimensionsResponse, error) {
+func (a *AnnotationsApiService) UpdateAnnotation(aNNOTATIONID string, annotationInput AnnotationInput, opts ...APIOption) (AnnotationResponse, error) {
 	var (
 		localVarAPIOptions   = new(APIOptions)
-		localVarHttpMethod   = strings.ToUpper("Get")
+		localVarHttpMethod   = strings.ToUpper("Patch")
 		localVarPostBody     interface{}
 		localVarFormFileName string
 		localVarFileName     string
 		localVarFileBytes    []byte
-		localVarReturnValue  ListDimensionsResponse
+		localVarReturnValue  AnnotationResponse
 	)
 
 	for _, opt := range opts {
@@ -264,14 +347,15 @@ func (a *DimensionsApiService) ListDimensions(opts ...APIOption) (ListDimensions
 	}
 
 	// create path and map variables
-	localVarPath := a.client.cfg.basePath + "/data/v1/dimensions"
+	localVarPath := a.client.cfg.basePath + "/data/v1/annotations/{ANNOTATION_ID}"
+	localVarPath = strings.Replace(localVarPath, "{"+"ANNOTATION_ID"+"}", fmt.Sprintf("%v", aNNOTATIONID), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
 	localVarFormParams := url.Values{}
 
 	// to determine the Content-Type header
-	localVarHttpContentTypes := []string{}
+	localVarHttpContentTypes := []string{"application/json"}
 
 	// set Content-Type header
 	localVarHttpContentType := selectHeaderContentType(localVarHttpContentTypes)
@@ -287,6 +371,8 @@ func (a *DimensionsApiService) ListDimensions(opts ...APIOption) (ListDimensions
 	if localVarHttpHeaderAccept != "" {
 		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
 	}
+	// body params
+	localVarPostBody = &annotationInput
 
 	r, err := a.client.prepareRequest(localVarAPIOptions, localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
 	if err != nil {
